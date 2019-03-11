@@ -30,4 +30,7 @@ repositories {
 dependencies {
     api fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.facebook.react:react-native:+'
+    implementation 'com.google.code.gson:gson:2.8.5'
+    // leolin310148 没发布最新版，所以直接调用 github
+    implementation 'com.github.leolin310148:ShortcutBadger:master-SNAPSHOT'
 }

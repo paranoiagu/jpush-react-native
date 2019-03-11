@@ -47,6 +47,7 @@ import cn.jpush.android.api.JPushInterface;
 import cn.jpush.android.api.JPushMessage;
 import cn.jpush.android.data.JPushLocalNotification;
 import cn.jpush.android.service.JPushMessageReceiver;
+import me.leolin.shortcutbadger.ShortcutBadger;
 
 public class JPushModule extends ReactContextBaseJavaModule implements LifecycleEventListener {
 
@@ -621,6 +622,20 @@ public class JPushModule extends ReactContextBaseJavaModule implements Lifecycle
                     String extras = mCachedBundle.getString(JPushInterface.EXTRA_EXTRA);
                     Logger.i(TAG, "收到推送下来的通知: " + alertContent);
                     Logger.i(TAG, "extras: " + extras);
+
+                    // 根据 extra 内容处理角标问题。
+                    PreferenceUtil preferenceUtil = new PreferenceUtil(context);
+                    Integer oldBadgeCount = Integer.parseInt(preferenceUtil.getSettingParam("APP_BADGE_COUNT", "0"));
+                    Integer changeBadgeCount = ExtraDataParser.getBadgeChange(extras);
+                    Integer badgeCount = oldBadgeCount + changeBadgeCount;
+                    preferenceUtil.setSettingParam("APP_BADGE_COUNT", "" + badgeCount);
+
+                    if (badgeCount == 0) {
+                        ShortcutBadger.removeCount(context);
+                    } else {
+                        ShortcutBadger.applyCount(context, badgeCount);
+                    }
+
                     mEvent = RECEIVE_NOTIFICATION;
                     if (mRAC != null) {
                         sendEvent();
